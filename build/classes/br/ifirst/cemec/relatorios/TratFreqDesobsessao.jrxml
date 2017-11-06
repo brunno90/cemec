@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="TratFreqPeriodo" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="dc10a555-9c28-4635-9384-00e1e451f67f">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="dtIni" class="java.util.Date">
+		<defaultValueExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}.get( "dtIni" )]]></defaultValueExpression>
+	</parameter>
+	<parameter name="dtFin" class="java.util.Date">
+		<defaultValueExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}.get( "dtFin" )]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+     frequentador."nm_freq" AS frequentador_nm_freq,
+     tratamentos."ds_tratamento" AS tratamentos_ds_tratamento,
+     mov_tratamento."dt_final" AS mov_tratamento_dt_final
+FROM
+     "public"."frequentador" frequentador INNER JOIN "public"."mov_tratamento" mov_tratamento ON frequentador."cd_freq" = mov_tratamento."cd_freq"
+     INNER JOIN "public"."tratamentos" tratamentos ON mov_tratamento."cd_trat" = tratamentos."cd_tratamento"
+WHERE
+     dt_final BETWEEN $P{dtIni} AND $P{dtFin} AND cd_tratamento = 5
+GROUP BY
+     nm_freq,
+     tratamentos.ds_tratamento,
+     dt_final
+ORDER BY
+     dt_final ASC]]>
+	</queryString>
+	<field name="frequentador_nm_freq" class="java.lang.String"/>
+	<field name="tratamentos_ds_tratamento" class="java.lang.String"/>
+	<field name="mov_tratamento_dt_final" class="java.sql.Date"/>
+	<title>
+		<band height="72" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="e370e6a0-0745-4886-b89a-8c6710bba885" x="0" y="42" width="555" height="27"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Relatório de Tratamento de Frequentadores]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="52926e55-f7f9-4f77-8453-5aa11ac563e2" x="0" y="2" width="332" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CASA ESPÍRITA MENSAGEIROS DA CARIDADE]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="7a8cb5d4-f404-4779-9922-ed5a93e04a8e" x="0" y="69" width="555" height="1"/>
+			</line>
+			<staticText>
+				<reportElement uuid="29b5cc28-96d2-4c10-88a3-b02fa349ae70" x="0" y="22" width="499" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Endereço: Rua Machado de Assis - Qd.01 Lt.07 - Bairro Anhanguera - Goiânia - GO - Cep: 74.355-100]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="d1dfef54-64a1-4322-9ad8-a45369832c58" x="412" y="2" width="143" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="43" splitType="Stretch">
+			<textField>
+				<reportElement uuid="d65d780a-842a-454b-a4ca-c25ff3a8fed5" x="499" y="0" width="56" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["Pag: "+ $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="152d0ea3-0c7e-4944-a148-5f939802021f" x="232" y="20" width="93" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data final do Trat.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="6ee2aeaa-f2fb-4bc1-8ea9-bc4c1fe60fbb" x="0" y="0" width="61" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Tratamento :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4fb52e72-83df-4173-b2bc-755dfea4af42" x="0" y="20" width="232" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Frequentador]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="3d55b0af-725c-4ed6-bdc2-46f1ac22a3cb" x="0" y="40" width="555" height="1"/>
+			</line>
+			<textField>
+				<reportElement uuid="11e1826c-4003-46c1-9759-ca6075d5b18d" x="61" y="0" width="171" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tratamentos_ds_tratamento}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement uuid="e237a0ea-dec9-4f49-834a-1fda6be69c9b" x="0" y="0" width="232" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{frequentador_nm_freq}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="8d7ec94f-42e3-48e3-8683-1b1c9dba36c0" x="232" y="0" width="93" height="20"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{mov_tratamento_dt_final}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="21" splitType="Stretch">
+			<textField>
+				<reportElement uuid="cac28227-5c6c-49e3-849c-2300e460b2aa" x="0" y="1" width="208" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Total de Registros: "+$V{REPORT_COUNT}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="cce20578-763c-4897-a101-8ee74b6c166e" x="0" y="1" width="555" height="1"/>
+			</line>
+		</band>
+	</summary>
+</jasperReport>

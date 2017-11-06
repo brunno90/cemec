@@ -1,0 +1,553 @@
+package br.ifirst.cemec.daos;
+
+import br.ifirst.cemec.connections.ObjetoDao;
+import br.ifirst.cemec.entidades.CalendarioTratamento;
+import br.ifirst.cemec.entidades.Frequentador;
+import br.ifirst.cemec.entidades.Tratamento;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import javax.swing.JOptionPane;
+
+/**
+ *
+ * @author Iagho
+ */
+public class TratamentoDao extends ObjetoDao {
+
+    public TratamentoDao(Connection conexao) {
+        super(conexao);
+    }
+
+    public int nextTratamento() {
+        Connection connection = null;
+        StringBuffer sql = null;
+        PreparedStatement pstmt = null;
+        ResultSet resultSet = null;
+        int cod;
+
+        try {
+            connection = this.conexao;
+
+            sql = new StringBuffer();
+            sql.append(" SELECT coalesce( Max(cd_tratamento), 0) + 1 as ultcod FROM tratamentos ");
+
+            pstmt = connection.prepareStatement(sql.toString());
+            resultSet = pstmt.executeQuery();
+
+            cod = resultSet.next() ? resultSet.getInt("ultcod") : 1;
+            return cod;
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            super.fecharCursores(resultSet, pstmt);
+        }
+        return 0;
+    }
+
+    public int Salvar(Tratamento t) {
+        PreparedStatement ps = null;
+        boolean result = false;
+        try {
+            ps = conexao.prepareStatement(" INSERT INTO tratamentos(cd_tratamento, ds_tratamento, rec_tratamento, nao_requer_pres, periodico, "
+                    + "nao_requer_calendario, data_definidas, requer_medium)"
+                    + " VALUES (?, ?, ?, ?, ?, ?, ?, ?) ");
+            t.setCdTratamento(nextTratamento());
+
+            ps.setInt(1, t.getCdTratamento());
+            ps.setString(2, t.getDsTratamento());
+            ps.setString(3, t.getRecTratamento());
+            ps.setInt(4, t.getNaoRecPres());
+            ps.setInt(5, t.getPeriodico());
+            ps.setInt(6, t.getNaoRequerCalendario());
+            ps.setInt(7, t.getDataDef());
+            ps.setInt(8, t.getMedium());
+
+            result = ps.execute();
+
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            fecharCursores(null, ps);
+        }
+
+        return t.getCdTratamento();
+    }
+
+    public boolean Alterar(Tratamento t) {
+        PreparedStatement ps = null;
+        boolean result = false;
+        try {
+
+            ps = conexao.prepareStatement(" UPDATE tratamentos SET ds_tratamento=?, rec_tratamento=?, nao_requer_pres=?, periodico=?, "
+                    + "nao_requer_calendario=?, data_definidas=?, requer_medium=? "
+                    + " WHERE cd_tratamento=? ");
+
+            ps.setString(1, t.getDsTratamento());
+            ps.setString(2, t.getRecTratamento());
+            ps.setInt(3, t.getNaoRecPres());
+            ps.setInt(4, t.getPeriodico());
+            ps.setInt(5, t.getNaoRequerCalendario());
+            ps.setInt(6, t.getDataDef());
+            ps.setInt(7, t.getMedium());
+            ps.setInt(8, t.getCdTratamento());
+
+            result = ps.execute();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            fecharCursores(null, ps);
+        }
+
+        return result;
+    }
+
+    public Tratamento getTratamento(int cod) {
+        ResultSet rs = null;
+
+        PreparedStatement ps = null;
+        Tratamento u = null;
+        try {
+
+            ps = conexao.prepareStatement("select * from tratamentos where cd_tratamento = ?");
+
+            ps.setInt(1, cod);
+
+            rs = ps.executeQuery();
+
+            u = setObjetoTratamento(rs);
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            fecharCursores(rs, ps);
+        }
+        return u;
+    }
+
+    private Tratamento setObjetoTratamento(ResultSet rs) throws SQLException {
+        Tratamento u = null;
+        if (rs.next()) {
+            u = new Tratamento();
+            u.setCdTratamento(rs.getInt("cd_tratamento"));
+            u.setDsTratamento(rs.getString("ds_tratamento"));
+            u.setRecTratamento(rs.getString("rec_tratamento"));
+            u.setNaoRecPres(rs.getInt("nao_requer_pres"));
+            u.setPeriodico(rs.getInt("periodico"));
+            u.setNaoRequerCalendario(rs.getInt("nao_requer_calendario"));
+            u.setDataDef(rs.getInt("data_definidas"));
+            u.setMedium(rs.getInt("requer_medium"));
+        }
+        return u;
+    }
+
+    public List<Tratamento> PesquisaTratamento(int box, String pesq) throws SQLException {
+        List<String> campos = new ArrayList<String>();
+        campos.add("ds_tratamento");
+        campos.add("cd_tratamento");
+
+        String sql = "select * from tratamentos where " + campos.get(box) + " ilike '" + pesq + "%' order by 1";
+        PreparedStatement stmt = conexao.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery();
+
+        List<Tratamento> list = new ArrayList<Tratamento>();
+
+        while (rs.next()) {
+            Tratamento f = new Tratamento();
+            f.setCdTratamento(rs.getInt("cd_tratamento"));
+            f.setDsTratamento(rs.getString("ds_tratamento"));
+            list.add(f);
+        }
+
+        rs.close();
+        stmt.close();
+
+        return list;
+    }
+
+    public boolean Excluir(int codigo) {
+        PreparedStatement ps = null;
+        boolean excluir = false;
+        try {
+            ps = conexao.prepareStatement("DELETE FROM tratamentos WHERE cd_tratamento = ?");
+
+            ps.setInt(1, codigo);
+
+            excluir = ps.execute();
+
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            fecharCursores(null, ps);
+        }
+
+        return excluir;
+    }
+
+    public Tratamento getTratamentoCalendar(int cod) {
+        ResultSet rs = null;
+
+        PreparedStatement ps = null;
+        Tratamento u = null;
+        try {
+
+            ps = conexao.prepareStatement("select A.ds_tratamento, A.requer_medium, A.rec_tratamento, A.nao_requer_pres, A.cd_tratamento as \"cd_trat\","
+                    + "A.periodico, A.nao_requer_calendario, A.data_definidas, B.* from tratamentos A "
+                    + "left join calendar_tratamento B on B.cd_tratamento = A.cd_tratamento "
+                    + "where A.cd_tratamento = ?");
+
+            ps.setInt(1, cod);
+
+            rs = ps.executeQuery();
+
+            u = setObjetoTratamentoCalendar(rs);
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            fecharCursores(rs, ps);
+        }
+        return u;
+    }
+
+    private Tratamento setObjetoTratamentoCalendar(ResultSet rs) throws SQLException {
+        Tratamento u = null;
+        if (rs.next()) {
+            u = new Tratamento();
+            u.setCdTratamento(rs.getInt("cd_trat"));
+            u.setDsTratamento(rs.getString("ds_tratamento"));
+            u.setRecTratamento(rs.getString("rec_tratamento"));
+            u.setNaoRecPres(rs.getInt("nao_requer_pres"));
+            u.setPeriodico(rs.getInt("periodico"));
+            u.setNaoRequerCalendario(rs.getInt("nao_requer_calendario"));
+            u.setDataDef(rs.getInt("data_definidas"));
+            u.setMedium(rs.getInt("requer_medium"));
+            CalendarioTratamento ct = new CalendarioTratamento();
+
+            ct.setDtIni(rs.getDate("dt_ini"));
+            ct.setDtFin(rs.getDate("dt_fin"));
+            ct.setSeg(rs.getInt("segunda"));
+            ct.setTer(rs.getInt("terca"));
+            ct.setQua(rs.getInt("quarta"));
+            ct.setQui(rs.getInt("quinta"));
+            ct.setSex(rs.getInt("sexta"));
+            ct.setSab(rs.getInt("sabado"));
+            ct.setDom(rs.getInt("domingo"));
+            ct.setTodosDias(rs.getInt("todos_dias"));
+
+            u.setCalendarioTratamento(ct);
+        }
+        return u;
+    }
+
+    public boolean excluirMovTratamentos(int cdFrequentador) {
+        PreparedStatement ps = null;
+        boolean result = false;
+        try {
+
+            ps = conexao.prepareStatement("DELETE from mov_tratamento WHERE cd_freq = ?");
+
+
+            ps.setInt(1, cdFrequentador);
+
+            result = ps.execute();
+
+
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Erro ao deletar!");
+            ex.printStackTrace();
+        } finally {
+            fecharCursores(null, ps);
+        }
+
+        return result;
+    }
+
+    public boolean excluirMovimento(int cdMov) {
+        PreparedStatement ps = null;
+        boolean result = false;
+        try {
+
+            ps = conexao.prepareStatement("DELETE from mov_tratamento WHERE cd_mov = ?");
+
+
+            ps.setInt(1, cdMov);
+
+            result = ps.execute();
+
+
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Erro ao deletar!");
+            ex.printStackTrace();
+        } finally {
+            fecharCursores(null, ps);
+        }
+
+        return result;
+    }
+
+    public int nextCodMov() {
+        Connection connection = null;
+        StringBuffer sql = null;
+        PreparedStatement pstmt = null;
+        ResultSet resultSet = null;
+        int cod;
+
+        try {
+            connection = this.conexao;
+
+            sql = new StringBuffer();
+            sql.append(" SELECT coalesce( Max(cd_mov), 0) + 1 as ultcod FROM mov_tratamento ");
+
+            pstmt = connection.prepareStatement(sql.toString());
+            resultSet = pstmt.executeQuery();
+
+            cod = resultSet.next() ? resultSet.getInt("ultcod") : 1;
+            return cod;
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            super.fecharCursores(resultSet, pstmt);
+        }
+        return 0;
+    }
+
+    public int SalvarMovTrat(Tratamento t) {
+        PreparedStatement ps = null;
+        boolean result = false;
+        try {
+
+            ps = conexao.prepareStatement("INSERT INTO mov_tratamento(cd_freq, cd_trat, dt_inicial, dt_final, qt_dias, "
+                    + "trat_dist, tp_periodo, cd_mov, dt_cad, nm_medium) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            t.setCdMov(nextCodMov());
+
+            ps.setInt(1, t.getFrequentador().getCdFrequentador());
+            ps.setInt(2, t.getCdTratamento());
+            ps.setDate(3, super.toSqlDate(t.getDtInicial()));
+            ps.setDate(4, super.toSqlDate(t.getDtFinal()));
+            ps.setInt(5, t.getQtDias());
+            ps.setInt(6, t.getTratDistancia() == true ? 1 : 0);
+            ps.setInt(7, t.getTpPeriodo());
+            ps.setInt(8, t.getCdMov());
+            ps.setDate(9, super.toSqlDate(t.getDtCad()));
+            ps.setString(10, t.getNmMedium());
+
+            result = ps.execute();
+
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            fecharCursores(null, ps);
+        }
+
+        return t.getCdMov();
+    }
+
+    public boolean UpdateMovTrat(Tratamento t) {
+        PreparedStatement ps = null;
+        boolean result = false;
+        try {
+
+            ps = conexao.prepareStatement("UPDATE mov_tratamento "
+                    + "SET dt_inicial=?, dt_final=?, qt_dias=?, trat_dist=?, tp_periodo=?, nm_medium=? "
+                    + "WHERE cd_mov=?");
+
+            ps.setDate(1, super.toSqlDate(t.getDtInicial()));
+            ps.setDate(2, super.toSqlDate(t.getDtFinal()));
+            ps.setInt(3, t.getQtDias());
+            ps.setInt(4, t.getTratDistancia() == true ? 1 : 0);
+            ps.setInt(5, t.getTpPeriodo());
+            ps.setString(6, t.getNmMedium());
+            ps.setInt(7, t.getCdMov());
+
+            result = ps.execute();
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            fecharCursores(null, ps);
+        }
+
+        return result;
+    }
+
+    public List<Tratamento> PesquisaMovTratamentos(int box, String pesq) throws SQLException {
+        List<String> campos = new ArrayList<String>();
+        campos.add("D.nm_freq");
+        campos.add("C.ds_tratamento");
+
+        String sql = "select A.cd_freq, D.nm_freq , A.cd_trat, C.ds_tratamento, A.cd_mov, B.dt_inicial, B.dt_final, B.trat_dist, A.presenca "
+                + "from datas_tratamento A "
+                + "inner join mov_tratamento B on B.cd_mov = A.cd_mov "
+                + "inner join tratamentos C on C.cd_tratamento = A.cd_trat "
+                + "inner join frequentador D on D.cd_freq = A.cd_freq "
+                + " where data =  CURRENT_DATE and trat_dist = 0 and " + campos.get(box) + " ilike '" + pesq + "%' "
+                + "or B.tp_periodo = 7 and trat_dist = 0 and " + campos.get(box) + " ilike '" + pesq + "%' order by D.nm_freq";
+        PreparedStatement stmt = conexao.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery();
+
+        List<Tratamento> list = new ArrayList<Tratamento>();
+
+        while (rs.next()) {
+            Tratamento t = new Tratamento();
+            Frequentador f = new Frequentador();
+            f.setCdFrequentador(rs.getInt("cd_freq"));
+            f.setNmFrequentador(rs.getString("nm_freq"));
+            t.setFrequentador(f);
+            t.setCdTratamento(rs.getInt("cd_trat"));
+            t.setDsTratamento(rs.getString("ds_tratamento"));
+            t.setCdMov(rs.getInt("cd_mov"));
+            t.setDtInicial(rs.getDate("dt_inicial"));
+            t.setDtFinal(rs.getDate("dt_final"));
+            t.setTratDistancia(rs.getInt("trat_dist") == 1 ? true : false);
+            t.setPresenca(rs.getInt("presenca") == 1 ? true : false);
+            list.add(t);
+        }
+        rs.close();
+        stmt.close();
+
+        return list;
+    }
+
+    public boolean excluirDatasMov(int cdMov) {
+        PreparedStatement ps = null;
+        boolean result = false;
+        try {
+
+            ps = conexao.prepareStatement("delete from datas_tratamento WHERE cd_mov = ?");
+
+
+            ps.setInt(1, cdMov);
+
+            result = ps.execute();
+
+
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Erro ao deletar!");
+            ex.printStackTrace();
+        } finally {
+            fecharCursores(null, ps);
+        }
+
+        return result;
+    }
+
+    public boolean excluirDatasMovDia(int cdMov) {
+        PreparedStatement ps = null;
+        boolean result = false;
+        try {
+
+            ps = conexao.prepareStatement("delete from datas_tratamento WHERE cd_mov = ? and data = CURRENT_DATE");
+
+
+            ps.setInt(1, cdMov);
+
+            result = ps.execute();
+
+
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Erro ao deletar!");
+            ex.printStackTrace();
+        } finally {
+            fecharCursores(null, ps);
+        }
+
+        return result;
+    }
+
+    public boolean excluirMov(int cdMov) {
+        PreparedStatement ps = null;
+        boolean result = false;
+        try {
+
+            ps = conexao.prepareStatement("DELETE from mov_tratamento WHERE cd_mov = ?");
+
+
+            ps.setInt(1, cdMov);
+
+            result = ps.execute();
+
+
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Erro ao deletar!");
+            ex.printStackTrace();
+        } finally {
+            fecharCursores(null, ps);
+        }
+
+        return result;
+    }
+
+    public Tratamento getMovTratamento(int cdMov) {
+        ResultSet rs = null;
+
+        PreparedStatement ps = null;
+        Tratamento u = null;
+        try {
+
+            ps = conexao.prepareStatement("Select A.*, B.ds_tratamento from mov_tratamento A "
+                    + "inner join tratamentos B on B.cd_tratamento = A.cd_trat where cd_mov = ?");
+
+            ps.setInt(1, cdMov);
+
+            rs = ps.executeQuery();
+
+            u = setObjetoMovTratamento(rs);
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            fecharCursores(rs, ps);
+        }
+        return u;
+    }
+
+    private Tratamento setObjetoMovTratamento(ResultSet rs) throws SQLException {
+        Tratamento u = null;
+        if (rs.next()) {
+            u = new Tratamento();
+            u.setCdMov(rs.getInt("cd_mov"));
+            u.setCdTratamento(rs.getInt("cd_trat"));
+            u.setDtInicial(rs.getDate("dt_inicial"));
+            u.setDtFinal(rs.getDate("dt_final"));
+            u.setQtDias(rs.getInt("qt_dias"));
+            u.setTratDistancia(rs.getInt("trat_dist") == 1 ? true : false);
+            u.setTpPeriodo(rs.getInt("tp_periodo"));
+            u.setNmMedium(rs.getString("nm_medium"));
+        }
+        return u;
+    }
+
+    public boolean LimpezaTratamento(Date datIni, Date datFin) {
+        PreparedStatement ps = null;
+        boolean result = false;
+        try {
+
+            ps = conexao.prepareStatement("DELETE from mov_tratamento WHERE cd_mov = ?");
+
+
+            ps.setDate(1, super.toSqlDate(datIni));
+            ps.setDate(2, super.toSqlDate(datFin));
+
+            result = ps.execute();
+
+
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Erro ao deletar!");
+            ex.printStackTrace();
+        } finally {
+            fecharCursores(null, ps);
+        }
+
+        return result;
+    }
+}

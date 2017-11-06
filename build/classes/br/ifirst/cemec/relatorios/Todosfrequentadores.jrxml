@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Todosfrequentadores" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b0a0318b-e650-479e-962f-81ea359da848">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString>
+		<![CDATA[SELECT
+     telefone."fone" AS telefone_fone,
+     telefone."ddd" AS telefone_ddd,
+     frequentador."cd_freq" AS frequentador_cd_freq,
+     frequentador."nm_freq" AS frequentador_nm_freq,
+     frequentador."email" AS frequentador_email,
+     frequentador."dt_cad" AS frequentador_dt_cad,
+     frequentador."idade" AS frequentador_idade,
+     frequentador."eq_cemec" AS frequentador_eq_cemec,
+     frequentador."dt_nasc" AS frequentador_dt_nasc,
+     frequentador."tot_freq" AS frequentador_tot_freq
+FROM
+     "public"."frequentador" frequentador LEFT OUTER JOIN "public"."telefone" telefone ON frequentador."cd_freq" = telefone."cd_pessoa" ORDER BY nm_freq]]>
+	</queryString>
+	<field name="telefone_fone" class="java.lang.String"/>
+	<field name="telefone_ddd" class="java.lang.String"/>
+	<field name="frequentador_cd_freq" class="java.lang.Integer"/>
+	<field name="frequentador_nm_freq" class="java.lang.String"/>
+	<field name="frequentador_email" class="java.lang.String"/>
+	<field name="frequentador_dt_cad" class="java.sql.Date"/>
+	<field name="frequentador_idade" class="java.lang.String"/>
+	<field name="frequentador_eq_cemec" class="java.lang.Integer"/>
+	<field name="frequentador_dt_nasc" class="java.sql.Date"/>
+	<field name="frequentador_tot_freq" class="java.lang.Integer"/>
+	<title>
+		<band height="102" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="35a12ef0-ba68-4ffc-a18d-ef4afdb50fd0" x="0" y="1" width="332" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CASA ESPÍRITA MENSAGEIROS DA CARIDADE]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="bb974542-f486-4d36-8eba-a3f15ff82f61" x="388" y="1" width="168" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="4780331d-0114-41de-93ed-b7429c8deae8" x="0" y="52" width="555" height="27"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Relatório de Frequentadores]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="ba50807a-d485-435e-83a9-e766c1598666" x="0" y="21" width="499" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Endereço: Rua Machado de Assis - Qd.01 Lt.07 - Bairro Anhanguera - Goiânia - GO - Cep: 74.355-100]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="0fb7a6ef-322e-4f7a-92c9-9804ee44b58c" x="0" y="78" width="555" height="1"/>
+			</line>
+			<staticText>
+				<reportElement uuid="e158337c-1512-4fd9-88c3-7abf9e8155fd" x="0" y="79" width="178" height="19"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Frequentador]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5614d4b4-db96-4b7d-8b27-a25928a7e22a" x="496" y="79" width="59" height="21"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Telefone]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="dc943670-e99e-4fde-8850-4845af4444c4" x="178" y="78" width="125" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[E-mail]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c67cd622-e7c2-4ceb-bd52-90a17ee62c09" x="371" y="78" width="68" height="21"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data de Nasc.]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="02a6659b-c0e5-4f26-a812-e3fa48906dfd" x="0" y="100" width="555" height="1"/>
+			</line>
+			<staticText>
+				<reportElement uuid="e72769b1-1298-418e-911b-ba20878e9878" x="440" y="78" width="56" height="21"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Frequência]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="decca5d1-f9a6-4fbb-8896-9934da107f0c" x="303" y="79" width="68" height="19"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data de Cad.]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="22" splitType="Stretch">
+			<textField>
+				<reportElement uuid="7f76ea7c-6ad7-4e43-8d0f-7edd227e2414" x="496" y="0" width="60" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{telefone_fone} == null ? "" : $F{telefone_fone}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="0c69cf26-925a-45f8-9650-c8a769c77dd1" x="439" y="0" width="57" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{frequentador_tot_freq}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="6425c3a3-028c-4288-8953-58673b34fa14" x="178" y="0" width="125" height="20"/>
+				<textElement verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{frequentador_email} == null ? "" : $F{frequentador_email}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="214953a2-b8a4-4655-8082-9abdd31d0764" x="371" y="0" width="68" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{frequentador_dt_nasc} == null ? "" : $F{frequentador_dt_nasc}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="77627c90-d232-4f70-b115-6e81f67ae240" x="0" y="0" width="178" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{frequentador_cd_freq} + " - " +$F{frequentador_nm_freq}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="b47e802f-2edd-4fdc-a9fe-6ee97462bfc2" x="303" y="0" width="68" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{frequentador_dt_cad}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="22" splitType="Stretch">
+			<textField>
+				<reportElement uuid="c9dcf479-94ec-4db7-9f33-aae3ef31e971" x="0" y="1" width="100" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Pag: "+$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="a219d219-33e9-45b4-b643-aa4d3237a24f" x="0" y="0" width="555" height="1"/>
+			</line>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="22" splitType="Stretch">
+			<textField>
+				<reportElement uuid="41f33aa3-33f7-443c-9e47-592adf65f7e3" x="0" y="1" width="208" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Total de Registros: "+$V{REPORT_COUNT}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="0e7793e8-d016-4951-ba77-1adfd0a827f0" x="1" y="0" width="555" height="1"/>
+			</line>
+		</band>
+	</summary>
+</jasperReport>

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ListaPresencaDes" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="0a8d0e4b-7732-4677-9f13-7e69cef68a07">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="cd_trat" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}.get( "cd_trat" )]]></defaultValueExpression>
+	</parameter>
+	<parameter name="tratDist" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}.get( "tratDist" )]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+     datas_tratamento."cd_freq" AS datas_tratamento_cd_freq,
+     datas_tratamento."presenca" AS datas_tratamento_presenca,
+     datas_tratamento."senha" AS datas_tratamento_senha,
+     frequentador."nm_freq" AS frequentador_nm_freq,
+     frequentador."cd_freq" AS frequentador_cd_freq,
+     datas_tratamento."data" AS datas_tratamento_data,
+     datas_tratamento."cd_trat" AS datas_tratamento_cd_trat,
+     tratamentos."cd_tratamento" AS tratamentos_cd_tratamento,
+     tratamentos."ds_tratamento" AS tratamentos_ds_tratamento,
+     datas_tratamento."preferencial" AS datas_tratamento_preferencial,
+     mov_tratamento."cd_mov" AS mov_tratamento_cd_mov,
+     datas_tratamento."cd_mov" AS datas_tratamento_cd_mov,
+     mov_tratamento."trat_dist" AS mov_tratamento_trat_dist,
+     mov_tratamento."nm_medium" AS mov_tratamento_nm_medium,
+     tp_periodo, dt_final
+FROM
+     "public"."frequentador" frequentador INNER JOIN "public"."datas_tratamento" datas_tratamento ON frequentador."cd_freq" = datas_tratamento."cd_freq"
+     INNER JOIN "public"."tratamentos" tratamentos ON datas_tratamento."cd_trat" = tratamentos."cd_tratamento"
+     INNER JOIN "public"."mov_tratamento" mov_tratamento ON datas_tratamento."cd_mov" = mov_tratamento."cd_mov"
+WHERE
+     data = CURRENT_DATE
+     and cd_tratamento = $P{cd_trat}
+     and trat_dist = $P{tratDist}
+     and dt_final > CURRENT_DATE
+or
+      tp_periodo = 7
+      and cd_tratamento = $P{cd_trat}
+      and trat_dist = $P{tratDist}
+      and dt_final > CURRENT_DATE
+ORDER BY
+     nm_freq, preferencial DESC]]>
+	</queryString>
+	<field name="datas_tratamento_cd_freq" class="java.lang.Integer"/>
+	<field name="datas_tratamento_presenca" class="java.lang.Integer"/>
+	<field name="datas_tratamento_senha" class="java.lang.Integer"/>
+	<field name="frequentador_nm_freq" class="java.lang.String"/>
+	<field name="frequentador_cd_freq" class="java.lang.Integer"/>
+	<field name="datas_tratamento_data" class="java.sql.Date"/>
+	<field name="datas_tratamento_cd_trat" class="java.lang.Integer"/>
+	<field name="tratamentos_cd_tratamento" class="java.lang.Integer"/>
+	<field name="tratamentos_ds_tratamento" class="java.lang.String"/>
+	<field name="datas_tratamento_preferencial" class="java.lang.Integer"/>
+	<field name="mov_tratamento_cd_mov" class="java.lang.Integer"/>
+	<field name="datas_tratamento_cd_mov" class="java.lang.Integer"/>
+	<field name="mov_tratamento_trat_dist" class="java.lang.Integer"/>
+	<field name="mov_tratamento_nm_medium" class="java.lang.String"/>
+	<field name="tp_periodo" class="java.lang.Integer"/>
+	<field name="dt_final" class="java.sql.Date"/>
+	<title>
+		<band height="42" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="1c765342-336c-4946-b882-6ea5509a92be" x="0" y="0" width="332" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CASA ESPÍRITA MENSAGEIROS DA CARIDADE]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement uuid="e75f5eb0-4ed5-4c7a-8aeb-45f1546d6271" x="358" y="0" width="123" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="9151e1b0-5ed1-4a38-97c3-c2ccbf235bbb" x="0" y="20" width="499" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Endereço: Rua Machado de Assis - Qd.01 Lt.07 - Bairro Anhanguera - Goiânia - GO - Cep: 74.355-100]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="6c6a66b7-f93c-4a3f-89ba-a901cd555ab0" x="-1" y="40" width="555" height="1"/>
+			</line>
+			<textField>
+				<reportElement uuid="6b662da1-15bf-4df1-ad64-cb64fe1f5c35" x="481" y="0" width="73" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Pag: " +$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="53" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="60b85a77-224d-48fa-9841-c2e31d22a062" x="53" y="31" width="229" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Frequentador]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="6c6a66b7-f93c-4a3f-89ba-a901cd555ab0" x="1" y="51" width="555" height="1"/>
+			</line>
+			<textField>
+				<reportElement uuid="a99d0405-7edc-4d60-9ca9-686e7944591f" x="1" y="2" width="554" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tratamentos_cd_tratamento}+" - "+$F{tratamentos_ds_tratamento}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="f028736e-64ca-4da4-afba-c40491c96ccb" x="1" y="31" width="52" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Senha]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="21" splitType="Stretch">
+			<textField>
+				<reportElement uuid="ef610e90-8de7-4818-af13-e6270a914159" x="53" y="0" width="229" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{frequentador_nm_freq}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="af92e258-911e-4567-b6d1-26b92680358f" x="1" y="0" width="52" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{datas_tratamento_senha} == null ? "" : $F{datas_tratamento_senha})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="65170490-d498-4cb0-8955-0f902e1b2eb4" x="282" y="0" width="90" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{datas_tratamento_preferencial} == 1 ? "Preferêncial" : "")]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

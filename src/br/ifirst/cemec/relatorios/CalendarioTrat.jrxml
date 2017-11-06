@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CalendarioTrat" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d1755626-0234-4e78-ac08-a3806d81e78a">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="cdIni" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}.get( "cdIni" )]]></defaultValueExpression>
+	</parameter>
+	<parameter name="cdFin" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}.get( "cdFin" )]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+     datas_definidas."cd_trat" AS datas_definidas_cd_trat,
+     datas_definidas."data" AS datas_definidas_data,
+     tratamentos."cd_tratamento" AS tratamentos_cd_tratamento,
+     tratamentos."ds_tratamento" AS tratamentos_ds_tratamento
+FROM
+     "public"."tratamentos" tratamentos INNER JOIN "public"."datas_definidas" datas_definidas ON tratamentos."cd_tratamento" = datas_definidas."cd_trat"
+WHERE cd_tratamento >= $P{cdIni} and cd_tratamento <= $P{cdFin}]]>
+	</queryString>
+	<field name="datas_definidas_data" class="java.sql.Date"/>
+	<field name="tratamentos_cd_tratamento" class="java.lang.Integer"/>
+	<field name="tratamentos_ds_tratamento" class="java.lang.String"/>
+	<title>
+		<band height="92" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="1c765342-336c-4946-b882-6ea5509a92be" x="0" y="2" width="332" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CASA ESPÍRITA MENSAGEIROS DA CARIDADE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9151e1b0-5ed1-4a38-97c3-c2ccbf235bbb" x="0" y="22" width="499" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Endereço: Rua Machado de Assis - Qd.01 Lt.07 - Bairro Anhanguera - Goiânia - GO - Cep: 74.355-100]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="581b6c6b-6478-4deb-ae3d-de7fb7a8de80" x="0" y="70" width="290" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Tratamento]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="81ae9e6c-a807-46f6-b095-33d6a54759e2" x="0" y="42" width="555" height="27"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Relatório de Calendário de Tratamento]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="6c6a66b7-f93c-4a3f-89ba-a901cd555ab0" x="0" y="70" width="555" height="1"/>
+			</line>
+			<line>
+				<reportElement uuid="6c6a66b7-f93c-4a3f-89ba-a901cd555ab0" x="0" y="90" width="555" height="1"/>
+			</line>
+			<staticText>
+				<reportElement uuid="581b6c6b-6478-4deb-ae3d-de7fb7a8de80" x="290" y="71" width="265" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Data]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="22" splitType="Stretch">
+			<textField>
+				<reportElement uuid="85ecf4f5-24c7-4cc3-937e-2b0cc95e5907" x="0" y="0" width="290" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tratamentos_cd_tratamento}+" - "+$F{tratamentos_ds_tratamento}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement uuid="05d008dc-b8aa-474b-bbac-2f69d755578e" x="290" y="0" width="265" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{datas_definidas_data}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="21" splitType="Stretch">
+			<line>
+				<reportElement uuid="6c6a66b7-f93c-4a3f-89ba-a901cd555ab0" x="0" y="0" width="555" height="1"/>
+			</line>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement uuid="e75f5eb0-4ed5-4c7a-8aeb-45f1546d6271" x="387" y="0" width="168" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="ad61aac7-9243-49aa-9f55-68079ec75f3b" x="0" y="1" width="100" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Pag: "+$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="21">
+			<line>
+				<reportElement uuid="6c6a66b7-f93c-4a3f-89ba-a901cd555ab0" x="0" y="0" width="555" height="1"/>
+			</line>
+			<textField>
+				<reportElement uuid="d6e4269d-4e04-47d2-9ba5-cee018bab2db" x="0" y="1" width="300" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Total de Registros: "+$V{REPORT_COUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

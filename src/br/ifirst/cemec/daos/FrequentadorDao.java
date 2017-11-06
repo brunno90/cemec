@@ -1,0 +1,336 @@
+package br.ifirst.cemec.daos;
+
+import br.ifirst.cemec.connections.ObjetoDao;
+import br.ifirst.cemec.entidades.Frequentador;
+import br.ifirst.cemec.entidades.Tratamento;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+/**
+ *
+ * @author Iagho
+ */
+public class FrequentadorDao extends ObjetoDao {
+
+    public FrequentadorDao(Connection conexao) {
+        super(conexao);
+    }
+
+    public int nextFrequentador() {
+        Connection connection = null;
+        StringBuffer sql = null;
+        PreparedStatement pstmt = null;
+        ResultSet resultSet = null;
+        int cod;
+
+        try {
+            connection = this.conexao;
+
+            sql = new StringBuffer();
+            sql.append(" SELECT coalesce( Max(cd_freq), 0) + 1 as ultcod FROM frequentador ");
+
+            pstmt = connection.prepareStatement(sql.toString());
+            resultSet = pstmt.executeQuery();
+
+            cod = resultSet.next() ? resultSet.getInt("ultcod") : 1;
+            return cod;
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            super.fecharCursores(resultSet, pstmt);
+        }
+        return 0;
+    }
+
+    public int Salvar(Frequentador frequentador) {
+
+        PreparedStatement ps = null;
+        boolean result = false;
+        try {
+            ps = conexao.prepareStatement("INSERT INTO frequentador(cd_freq, nm_freq, email, dt_cad, dt_nasc, idade, nm_mae, eq_cemec, nes_especial, situacao) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            frequentador.setCdFrequentador(nextFrequentador());
+
+            ps.setInt(1, frequentador.getCdFrequentador());
+            ps.setString(2, frequentador.getNmFrequentador());
+            ps.setString(3, frequentador.getEmail());
+            ps.setDate(4, frequentador.getDtCad());
+            ps.setDate(5, frequentador.getDtNasc());
+            ps.setInt(6, frequentador.getIdade());
+            ps.setString(7, frequentador.getNmMae());
+            ps.setInt(8, frequentador.getEqCemec());
+            ps.setInt(9, frequentador.getEspecial());
+            ps.setInt(10, frequentador.getSituacao());
+
+            result = ps.execute();
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            fecharCursores(null, ps);
+        }
+
+        return frequentador.getCdFrequentador();
+
+    }
+
+    public boolean Alterar(Frequentador frequentador) {
+
+        PreparedStatement ps = null;
+        boolean result = false;
+        try {
+
+            ps = conexao.prepareStatement("UPDATE frequentador SET nm_freq=?, email=?, dt_nasc=?, idade=?, nm_mae=?, eq_cemec=?, nes_especial=?"
+                    + " WHERE cd_freq=?");
+
+            ps.setString(1, frequentador.getNmFrequentador());
+            ps.setString(2, frequentador.getEmail());
+            ps.setDate(3, frequentador.getDtNasc());
+            ps.setInt(4, frequentador.getIdade());
+            ps.setString(5, frequentador.getNmMae());
+            ps.setInt(6, frequentador.getEqCemec());
+            ps.setInt(7, frequentador.getEspecial());
+            ps.setInt(8, frequentador.getCdFrequentador());
+
+            result = ps.execute();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            fecharCursores(null, ps);
+        }
+
+        return result;
+    }
+
+    public Frequentador getFrequentadorCod(int cod) {
+        ResultSet rs = null;
+
+        PreparedStatement ps = null;
+        Frequentador u = null;
+        try {
+
+            ps = conexao.prepareStatement("SELECT cd_freq, nm_freq, email, dt_cad, dt_nasc, idade, nm_mae, eq_cemec, nes_especial"
+                    + " FROM frequentador where cd_freq = ?");
+
+            ps.setInt(1, cod);
+
+            rs = ps.executeQuery();
+
+            u = setObjetoFrequentador(rs);
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            fecharCursores(rs, ps);
+        }
+        return u;
+    }
+public Frequentador getMediumCod(int cod) {
+        ResultSet rs = null;
+
+        PreparedStatement ps = null;
+        Frequentador u = null;
+        try {
+
+            ps = conexao.prepareStatement("SELECT cd_freq, nm_freq, email, dt_cad, dt_nasc, idade, nm_mae, eq_cemec, nes_especial"
+                    + " FROM frequentador where cd_freq = ? and eq_cemec = 1");
+
+            ps.setInt(1, cod);
+
+            rs = ps.executeQuery();
+
+            u = setObjetoFrequentador(rs);
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            fecharCursores(rs, ps);
+        }
+        return u;
+    }
+    private Frequentador setObjetoFrequentador(ResultSet rs) throws SQLException {
+        Frequentador u = null;
+        if (rs.next()) {
+            u = new Frequentador();
+            u.setCdFrequentador(rs.getInt("cd_freq"));
+            u.setNmFrequentador(rs.getString("nm_freq"));
+            u.setEmail(rs.getString("email"));
+            u.setDtNasc(rs.getDate("dt_nasc"));
+            u.setIdade(rs.getInt("idade"));
+            u.setDtCad(rs.getDate("dt_cad"));
+            u.setNmMae(rs.getString("nm_mae"));
+            u.setEqCemec(rs.getInt("eq_cemec"));
+            u.setEspecial(rs.getInt("nes_especial"));
+        }
+        return u;
+    }
+
+    public List<Frequentador> PesquisaFrequentador(int campo, String valor) throws SQLException {
+        List<String> campos = new ArrayList<String>();
+        campos.add("nm_freq");
+        campos.add("nm_mae");
+
+        String sql = "select A.*, B.presenca, B.data from frequentador A "
+                + "left join datas_tratamento B on B.cd_freq = A.cd_freq and data = CURRENT_DATE "
+                + "where " + campos.get(campo) + " ilike '%" + valor + "%' order by 1";
+        PreparedStatement stmt = conexao.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery();
+
+        List<Frequentador> list = new ArrayList<Frequentador>();
+
+        while (rs.next()) {
+            Frequentador f = new Frequentador();
+            f.setCdFrequentador(rs.getInt("cd_freq"));
+            f.setNmFrequentador(rs.getString("nm_freq"));
+            f.setEmail(rs.getString("email"));
+            Tratamento t = new Tratamento();
+            t.setPresenca(rs.getInt("presenca") == 1 ? true : false);
+            f.setTratamento(t);
+            list.add(f);
+        }
+
+        rs.close();
+        stmt.close();
+
+        return list;
+    }
+
+    public List<Frequentador> PesquisaMedium(int campo, String valor) throws SQLException {
+        List<String> campos = new ArrayList<String>();
+        campos.add("nm_freq");
+        campos.add("nm_mae");
+
+        String sql = "select * from frequentador where eq_cemec = 1 and " + campos.get(campo) + " ilike '" + valor + "%' order by 1";
+        PreparedStatement stmt = conexao.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery();
+
+        List<Frequentador> list = new ArrayList<Frequentador>();
+
+        while (rs.next()) {
+            Frequentador f = new Frequentador();
+            f.setCdFrequentador(rs.getInt("cd_freq"));
+            f.setNmFrequentador(rs.getString("nm_freq"));
+            list.add(f);
+        }
+
+        rs.close();
+        stmt.close();
+
+        return list;
+    }
+
+    public boolean Excluir(int codigo) {
+
+        PreparedStatement ps = null;
+        boolean excluir = false;
+        try {
+            ps = conexao.prepareStatement("DELETE FROM frequentador WHERE cd_freq = ?");
+
+            ps.setInt(1, codigo);
+
+            excluir = ps.execute();
+
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            fecharCursores(null, ps);
+        }
+
+        return excluir;
+    }
+
+    public Collection<Tratamento> getMovTratamentos(int codFreq) throws SQLException {
+
+        Collection<Tratamento> t = null;
+        PreparedStatement ps = null;
+        StringBuilder sql = null;
+
+        try {
+
+            sql = new StringBuilder("SELECT A.*, B.nm_freq, C.ds_tratamento FROM mov_tratamento A "
+                    + "inner join frequentador B on B.cd_freq = A.cd_freq "
+                    + "inner join tratamentos C on C.cd_tratamento = A.cd_trat "
+                    + "WHERE A.cd_freq = ? order by dt_inicial ASC");
+
+            PreparedStatement stmt = conexao.prepareStatement(sql.toString());
+            stmt.setInt(1, codFreq);
+
+            ResultSet rs = stmt.executeQuery();
+
+            t = new ArrayList<Tratamento>();
+
+            while (rs.next()) {
+                Tratamento trat = new Tratamento();
+                trat.setCdMov(rs.getInt("cd_mov"));
+                trat.setCdTratamento(rs.getInt("cd_trat"));
+                trat.setDtInicial(rs.getDate("dt_inicial"));
+                trat.setDtFinal(rs.getDate("dt_final"));
+                trat.setQtDias(rs.getInt("qt_dias"));
+                trat.setTratDistancia(rs.getInt("trat_dist") == 1 ? true : false);
+                trat.setTpPeriodo(rs.getInt("tp_periodo"));
+                trat.setDsTratamento(rs.getString("ds_tratamento"));
+                Frequentador f = new Frequentador();
+                f.setNmFrequentador(rs.getString("nm_freq"));
+                trat.setFrequentador(f);
+                t.add(trat);
+            }
+
+            return t;
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            fecharCursores(null, ps);
+        }
+
+        return t;
+
+    }
+
+    public boolean MarcaPresenca(int cdFreq) {
+        PreparedStatement ps = null;
+        boolean presenca = false;
+        try {
+            ps = conexao.prepareStatement("update frequentador set tot_freq =  tot_freq + 1 where cd_freq = ?");
+
+            ps.setInt(1, cdFreq );
+
+            presenca = ps.execute();
+
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            fecharCursores(null, ps);
+        }
+
+        return presenca;
+    }
+
+    public boolean RetirarPresenca(int cdFreq) {
+        PreparedStatement ps = null;
+        boolean presenca = false;
+        try {
+            ps = conexao.prepareStatement("update frequentador set tot_freq =  tot_freq - 1 where cd_freq = ?");
+
+            ps.setInt(1, cdFreq );
+
+            presenca = ps.execute();
+
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            fecharCursores(null, ps);
+        }
+
+        return presenca;
+    }
+}
